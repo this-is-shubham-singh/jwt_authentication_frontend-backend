@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
@@ -7,6 +7,10 @@ function ResetPassword() {
   const [pageState, setPageState] = useState("email");
   const navigate = useNavigate();
   const { setIsLoggedIn } = useContext(AppContext);
+  const [email, setEmail] = useState("");
+  const optInputs = useRef([]);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   function emailSubmit() {
     // call the api
@@ -22,7 +26,8 @@ function ResetPassword() {
   function newPasswordSubmit() {
     // call the api
 
-    navigate("/login")
+    setIsLoggedIn(false);
+    navigate("/login");
   }
 
   return (
@@ -37,6 +42,8 @@ function ResetPassword() {
             type="email"
             placeholder="Email Address"
             className="reset-input"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <button className="reset-button" onClick={emailSubmit}>
             Submit
@@ -74,11 +81,15 @@ function ResetPassword() {
             type="password"
             placeholder="New Password"
             className="reset-input"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
           />
           <input
             type="password"
             placeholder="Confirm Password"
             className="reset-input"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
           <button className="reset-button" onClick={newPasswordSubmit}>
             Submit

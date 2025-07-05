@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 
 function Login() {
   const [pageState, setPageState] = useState("login");
@@ -8,8 +9,12 @@ function Login() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setIsLoggedIn } = useContext(AppContext);
 
-  const onLogin = () => {};
+  const onLogin = () => {
+    setIsLoggedIn(true);
+    navigate("/");
+  };
   const onSignUp = () => {};
 
   return (

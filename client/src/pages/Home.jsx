@@ -13,7 +13,9 @@ function Home() {
         <div className="nav-icon">🌐</div>
 
         {!isLoggedIn ? (
-          <button className="login-button">Login</button>
+          <button className="login-button" onClick={() => navigate("/login")}>
+            Login
+          </button>
         ) : (
           <div className="profile-wrapper">
             <div className="profile-circle">S</div>
