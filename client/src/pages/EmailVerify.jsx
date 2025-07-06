@@ -7,17 +7,30 @@ function EmailVerify() {
   function otpValue(e, index) {
     console.log(e.key);
 
-    if(e.key == "Backspace") {
+    if (e.key == "Backspace") {
       otpContainer.current[index].value = "";
 
-      if(index > 0) {
-         otpContainer.current[index - 1].focus();
+      if (index > 0) {
+        otpContainer.current[index - 1].focus();
       }
 
       return;
     }
 
-    if(isNaN(e.key)) {
+    if (e.key == "ArrowLeft") {
+      if (index > 0) {
+        otpContainer.current[index - 1].focus();
+      }
+    }
+
+    if (e.key == "ArrowRight") {
+      if (index < 5) {
+        otpContainer.current[index + 1].focus();
+      }
+    }
+
+    if (isNaN(e.key)) {
+      e.preventDefault();
       return;
     }
 

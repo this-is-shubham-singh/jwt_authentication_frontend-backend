@@ -8,7 +8,7 @@ function ResetPassword() {
   const navigate = useNavigate();
   const { setIsLoggedIn } = useContext(AppContext);
   const [email, setEmail] = useState("");
-  const optInputs = useRef([]);
+  const otpContainer = useRef([]);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -28,6 +28,43 @@ function ResetPassword() {
 
     setIsLoggedIn(false);
     navigate("/login");
+  }
+
+  function otpValue(e, index) {
+    console.log(e.key);
+
+    if (e.key == "Backspace") {
+      otpContainer.current[index].value = "";
+
+      if (index > 0) {
+        otpContainer.current[index - 1].focus();
+      }
+
+      return;
+    }
+
+    if (e.key == "ArrowLeft") {
+      if (index > 0) {
+        otpContainer.current[index - 1].focus();
+      }
+    }
+
+    if (e.key == "ArrowRight") {
+      if (index < 5) {
+        otpContainer.current[index + 1].focus();
+      }
+    }
+
+    if (isNaN(e.key)) {
+      e.preventDefault();
+      return;
+    }
+
+    otpContainer.current[index].value = e.key;
+
+    if (index < 5) {
+      otpContainer.current[index + 1].focus();
+    }
   }
 
   return (
@@ -59,12 +96,17 @@ function ResetPassword() {
           </p>
 
           <div className="otp-boxes">
-            <input type="text" maxLength="1" className="otp-input" />
-            <input type="text" maxLength="1" className="otp-input" />
-            <input type="text" maxLength="1" className="otp-input" />
-            <input type="text" maxLength="1" className="otp-input" />
-            <input type="text" maxLength="1" className="otp-input" />
-            <input type="text" maxLength="1" className="otp-input" />
+            {Array.from({ length: 6 }).map((value, index) => {
+              return (
+                <input
+                  type="text"
+                  maxLength="1"
+                  ref={(curr) => (otpContainer.current[index] = curr)}
+                  className="otp-input"
+                  onKeyDown={(e) => otpValue(e, index)}
+                />
+              );
+            })}
           </div>
 
           <button className="verify-button" onClick={otpSubmit}>

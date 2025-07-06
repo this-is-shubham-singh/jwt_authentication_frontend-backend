@@ -7,6 +7,12 @@ function Home() {
   const { isLoggedIn } = useContext(AppContext);
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+
+    
+    navigate("/login");
+  };
+
   return (
     <div className="home-container">
       <nav className="navbar">
@@ -26,7 +32,9 @@ function Home() {
               >
                 Verify Email
               </div>
-              <div className="dropdown-item">Logout</div>
+              <div className="dropdown-item" onClick={handleLogout}>
+                Logout
+              </div>
             </div>
           </div>
         )}
