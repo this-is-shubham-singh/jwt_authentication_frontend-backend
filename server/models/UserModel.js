@@ -1,3 +1,5 @@
+import { defaultMaxListeners } from "nodemailer/lib/xoauth2";
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -28,6 +30,10 @@ const userSchema = new mongoose.Schema({
   verifyEmailOtpExpiry: {
     type: Date,
     default: Date.now,
+  },
+  isUserVerified: {
+    type: Boolean,
+    default: false,
   },
 });
 
