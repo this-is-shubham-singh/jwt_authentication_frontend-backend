@@ -1,4 +1,4 @@
-import { defaultMaxListeners } from "nodemailer/lib/xoauth2";
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   name: {
