@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   verifyEmailOtp: {
     type: String,
-    dfeault: "",
+    default: "",
   },
   verifyEmailOtpExpiry: {
     type: Number,

@@ -121,36 +121,6 @@ const logout = async (req, res) => {
   }
 };
 
-const send_reset_otp = async (req, res) => {
-  try {
-  } catch (e) {
-    res.status(500).json({
-      success: false,
-      message: e.message,
-    });
-  }
-};
-
-const verify_reset_otp = async (req, res) => {
-  try {
-  } catch (e) {
-    res.status(500).json({
-      success: false,
-      message: e.message,
-    });
-  }
-};
-
-const save_reset_password = async (req, res) => {
-  try {
-  } catch (e) {
-    res.status(500).json({
-      success: false,
-      message: e.message,
-    });
-  }
-};
-
 const send_verify_otp = async (req, res) => {
   try {
     // getting id which was set by middleware authentication
@@ -245,11 +215,149 @@ const verify_account = async (req, res) => {
 
     // setting the isUserVerified to true
     user_data.isUserVerified = true;
-    user_data.save();
+    user_data.verifyEmailOtp = "";
+    user_data.verifyEmailOtpExpiry = 0;
+    await user_data.save();
 
     return res.status(200).json({
       success: true,
       message: "otp verification successfull",
+    });
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      message: e.message,
+    });
+  }
+};
+
+const send_reset_otp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // check if user exist with the recieved mail id
+    const user_data = await User.findOne({ email });
+    if (!user_data) {
+      return res.status(400).json({
+        success: false,
+        message: "enter a valid email id",
+      });
+    }
+
+    // generate an otp
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    // save otp and expiry time in db
+    user_data.resetPasswordOtp = otp;
+    user_data.resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user_data.save();
+
+    // generate a token
+    const payload = {
+      id: user_data._id,
+    };
+    const token = await jwt.sign(payload, process.env.SECRET_KEY, {
+      expiresIn: "10m",
+    });
+
+    // send mail with otp
+    await transporter.sendMail({
+      from: process.env.EMAILER,
+      to: user_data.email,
+      subject: "verify your otp for password change",
+      html: `<p>this is your otp for reset password <b>${otp}</b></p>`,
+    });
+
+    // send response with the token
+    return res.status(200).json({
+      success: true,
+      message: "reset otp sent",
+      reset_token: token,
+    });
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      message: e.message,
+    });
+  }
+};
+
+const verify_reset_otp = async (req, res) => {
+  try {
+    // get otp and from user
+    const { otp } = req.body;
+
+    console.log(otp);
+    // get id of user form request which was set by middleware
+    const { id } = req.user;
+
+    // get user data using id and verify
+    const user_data = await User.findById(id);
+    if (!user_data) {
+      return res.status(400).json({
+        success: false,
+        message: "user doesn't exist ",
+      });
+    }
+
+    // verify the otp and expiry
+    if (otp != user_data.resetPasswordOtp) {
+      return res.status(400).json({
+        success: false,
+        message: "invalid otp",
+      });
+    } else if (Date.now() > user_data.resetPasswordOtpExpiry) {
+      return res.status(400).json({
+        success: false,
+        message: "otp expired",
+      });
+    }
+
+    // set default values of resetotp in db
+    user_data.resetPasswordOtp = "";
+    user_data.resetPasswordOtpExpiry = 0;
+    await user_data.save();
+
+    // send true response
+    return res.status(200).json({
+      success: true,
+      message: "otp verified",
+    });
+
+    // for testing
+    // Key: Authorization
+    // Value: Bearer <your_token_here>
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      message: e.message,
+    });
+  }
+};
+
+const save_reset_password = async (req, res) => {
+  try {
+    const { new_password } = req.body;
+
+    // get id from the req, set by middleware
+    const { id } = req.user;
+
+    // get user data using id and verify
+    const user_data = await User.findById(id);
+    if (!user_data) {
+      return res.status(400).json({
+        success: false,
+        message: "user doesn't exist ",
+      });
+    }
+
+    user_data.password = new_password;
+    await user_data.save();
+
+    // send true response
+    return res.status(200).json({
+      success: true,
+      message: "new password saved",
     });
   } catch (e) {
     res.status(500).json({
