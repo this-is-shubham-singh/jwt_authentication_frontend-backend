@@ -7,7 +7,7 @@ import route from "./routes/Routes.js";
 const app = express();
 dotenv.config();
 
-// db connections 
+// db connections
 dbConnection();
 
 const port = process.env.PORT || 5000;
@@ -21,4 +21,8 @@ app.use("/api/auth", route);
 
 app.listen(port, () => {
   console.log("listening at port" + " " + port);
+});
+
+app.get("/", (req, res) => {
+  res.send("<h2>server is running</h2>");
 });

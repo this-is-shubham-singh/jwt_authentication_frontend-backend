@@ -19,17 +19,19 @@ const userSchema = new mongoose.Schema({
   },
   resetPasswordOtp: {
     type: String,
+    default: "",
   },
   resetPasswordOtpExpiry: {
-    type: Date,
-    default: Date.now, // no () after now as it will set default value at schema creation time.
+    type: Number,
+    default: 0, // no () after now as it will set default value at schema creation time.
   },
   verifyEmailOtp: {
     type: String,
+    dfeault: "",
   },
   verifyEmailOtpExpiry: {
-    type: Date,
-    default: Date.now,
+    type: Number,
+    default: 0,
   },
   isUserVerified: {
     type: Boolean,
