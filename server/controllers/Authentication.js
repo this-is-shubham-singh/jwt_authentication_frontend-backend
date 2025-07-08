@@ -337,7 +337,13 @@ const verify_reset_otp = async (req, res) => {
 
 const save_reset_password = async (req, res) => {
   try {
-    const { new_password } = req.body;
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: "no password recieved",
+      });
+    }
 
     // get id from the req, set by middleware
     const { id } = req.user;
@@ -351,7 +357,9 @@ const save_reset_password = async (req, res) => {
       });
     }
 
-    user_data.password = new_password;
+    const hashed_password = await bcrypt.hash(password, 10);
+
+    user_data.password = hashed_password;
     await user_data.save();
 
     // send true response

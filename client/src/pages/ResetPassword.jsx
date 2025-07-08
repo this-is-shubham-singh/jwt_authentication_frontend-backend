@@ -1,39 +1,83 @@
-import React, { useContext, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import "../App.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
 
 function ResetPassword() {
-  const [pageState, setPageState] = useState("email");
   const navigate = useNavigate();
-  const { setIsLoggedIn } = useContext(AppContext);
+
+  const { send_reset_pass_otp, verify_reset_otp, save_reset_password } =
+    useContext(AppContext);
+
   const [email, setEmail] = useState("");
   const otpContainer = useRef([]);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [searchParams, setSearchParam] = useSearchParams();
+  const step = searchParams.get("step") || "email";
 
-  function emailSubmit() {
+  async function emailSubmit() {
     // call the api
+    if (!email) {
+      return toast.warning("enter email");
+    }
 
-    setPageState("otp");
+    const response = await send_reset_pass_otp(email);
+
+    if (response == true) {
+      toast.success("otp sent to mail");
+      setSearchParam({ step: "otp" });
+    }
   }
 
-  function otpSubmit() {
+  async function otpSubmit() {
     // call the api
-    setPageState("newPassword");
+
+    let otp = "";
+
+    for (let i = 0; i < 6; i++) {
+      otp += otpContainer.current[i].value;
+      otpContainer.current[i].value = "";
+    }
+
+    if (otp.length != 6) {
+      toast.warning("enter complete otp");
+      return false;
+    }
+
+    const response = await verify_reset_otp(otp);
+
+    if (response == true) {
+      toast.success("opt verified");
+      setSearchParam({ step: "newPassword" });
+    }
   }
 
-  function newPasswordSubmit() {
+  async function newPasswordSubmit() {
     // call the api
 
-    setIsLoggedIn(false);
-    navigate("/login");
+    if (!newPassword || !confirmPassword) {
+      toast.warning("enter password");
+      return;
+    } else if (newPassword != confirmPassword) {
+      toast.warning("password doesnot match");
+      return;
+    }
+
+    const response = await save_reset_password(newPassword);
+
+    if (response == true) {
+      toast.success("password change !login now");
+      navigate("/login");
+    }
   }
 
   function otpValue(e, index) {
     console.log(e.key);
 
     if (e.key == "Backspace") {
+      e.preventDefault();
       otpContainer.current[index].value = "";
 
       if (index > 0) {
@@ -55,11 +99,12 @@ function ResetPassword() {
       }
     }
 
-    if (isNaN(e.key)) {
+    if (!/^\d$/.test(e.key)) {
       e.preventDefault();
       return;
     }
 
+    e.preventDefault();
     otpContainer.current[index].value = e.key;
 
     if (index < 5) {
@@ -71,7 +116,7 @@ function ResetPassword() {
     <div className="reset-container">
       {/* Reset Password Email Box */}
 
-      {pageState == "email" && (
+      {step == "email" && (
         <div className="reset-box">
           <h2 className="reset-heading">Reset Password</h2>
           <p className="reset-text">Enter your registered email address.</p>
@@ -82,13 +127,13 @@ function ResetPassword() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <button className="reset-button" onClick={emailSubmit}>
+          <button className="reset-button" onClick={() => emailSubmit()}>
             Submit
           </button>
         </div>
       )}
 
-      {pageState == "otp" && (
+      {step == "otp" && (
         <div className="verify-box">
           <h2 className="verify-heading">Email Verify OTP</h2>
           <p className="verify-text">
@@ -115,7 +160,7 @@ function ResetPassword() {
         </div>
       )}
 
-      {pageState == "newPassword" && (
+      {step == "newPassword" && (
         <div className="reset-box">
           <h2 className="reset-heading">New Password</h2>
           <p className="reset-text">Enter new password.</p>
@@ -133,7 +178,7 @@ function ResetPassword() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-          <button className="reset-button" onClick={newPasswordSubmit}>
+          <button className="reset-button" onClick={() => newPasswordSubmit()}>
             Submit
           </button>
         </div>

@@ -4,7 +4,8 @@ import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
-  const { isLoggedIn, user_logout, send_verify_otp } = useContext(AppContext);
+  const { isLoggedIn, user_logout, send_verify_otp, user_data } =
+    useContext(AppContext);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -35,12 +36,15 @@ function Home() {
           <div className="profile-wrapper">
             <div className="profile-circle">S</div>
             <div className="dropdown">
-              <div
-                className="dropdown-item"
-                onClick={() => handle_verify_email()}
-              >
-                Verify Email
-              </div>
+              {!user_data.is_user_verified && (
+                <div
+                  className="dropdown-item"
+                  onClick={() => handle_verify_email()}
+                >
+                  Verify Email
+                </div>
+              )}
+
               <div className="dropdown-item" onClick={() => handleLogout()}>
                 Logout
               </div>

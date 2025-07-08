@@ -10,7 +10,11 @@ function Login() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setIsLoggedIn, create_user, login_user } = useContext(AppContext);
+  const context = useContext(AppContext);
+  if (!context) {
+    return null;
+  }
+  const { setIsLoggedIn, create_user, login_user } = context;
 
   const onLogin = async () => {
     if (!email || !password) {
@@ -18,12 +22,14 @@ function Login() {
       return;
     }
 
-    setIsLoggedIn(true);
     const response = await login_user(email, password);
-    if (response) {
+    if (response === true) {
       setEmail("");
       setPassword("");
       navigate("/");
+      setIsLoggedIn(true);
+    } else {
+      toast.error("wrong password");
     }
   };
 

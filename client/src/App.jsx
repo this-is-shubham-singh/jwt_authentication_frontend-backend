@@ -2,17 +2,12 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import EmailVerify from "./pages/EmailVerify";
 import ResetPassword from "./pages/ResetPassword";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useContext } from "react";
-import { AppContext } from "./context/AppContext";
+import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GuestRoute from "./components/GuestRoute.jsx";
 
 const App = () => {
-  const { isLoggedIn } = useContext(AppContext);
-  const navigate = useNavigate();
 
   return (
     <div>

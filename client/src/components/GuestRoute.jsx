@@ -1,11 +1,16 @@
 import React from "react";
 import { useContext } from "react";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../context/AppContext.jsx";
 import { Navigate, Outlet } from "react-router-dom";
 
 const GuestRoute = () => {
-  const { isLoggedIn } = useContext(AppContext);
-  console.log(isLoggedIn)
+  const context = useContext(AppContext);
+
+  if (!context) {
+    return null;
+  }
+
+  const { isLoggedIn } = context;
 
   return isLoggedIn ? <Navigate to="/" /> : <Outlet />;
 };
