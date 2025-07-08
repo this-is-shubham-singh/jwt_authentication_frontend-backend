@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
 
 function Login() {
   const [pageState, setPageState] = useState("login");
@@ -9,13 +10,36 @@ function Login() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setIsLoggedIn } = useContext(AppContext);
+  const { setIsLoggedIn, create_user, login_user } = useContext(AppContext);
 
-  const onLogin = () => {
+  const onLogin = async () => {
+    if (!email || !password) {
+      toast.warning("enter all data");
+      return;
+    }
+
     setIsLoggedIn(true);
-    navigate("/");
+    const response = await login_user(email, password);
+    if (response) {
+      setEmail("");
+      setPassword("");
+      navigate("/");
+    }
   };
-  const onSignUp = () => {};
+
+  const onSignUp = async () => {
+    if (!email || !name || !password) {
+      toast.warning("enter all details");
+      return;
+    }
+    const response = await create_user(name, email, password);
+    if (response) {
+      setEmail("");
+      setPassword("");
+      setName("");
+      setPageState("login");
+    }
+  };
 
   return (
     <div className="container">
@@ -62,11 +86,11 @@ function Login() {
         )}
 
         {pageState == "login" ? (
-          <button className="signup-button" onClick={onLogin}>
+          <button className="signup-button" onClick={() => onLogin()}>
             login
           </button>
         ) : (
-          <button className="signup-button" onClick={onSignUp}>
+          <button className="signup-button" onClick={() => onSignUp()}>
             Sign Up
           </button>
         )}

@@ -1,16 +1,25 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import "../App.css";
 import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
-  const { isLoggedIn } = useContext(AppContext);
+  const { isLoggedIn, user_logout, send_verify_otp } = useContext(AppContext);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const response = await user_logout();
 
-    
-    navigate("/login");
+    if (response) {
+      navigate("/login");
+    }
+  };
+
+  const handle_verify_email = async () => {
+    const response = await send_verify_otp();
+    if (response == true) {
+      navigate("/email-verify");
+    }
   };
 
   return (
@@ -28,11 +37,11 @@ function Home() {
             <div className="dropdown">
               <div
                 className="dropdown-item"
-                onClick={() => navigate("/email-verify")}
+                onClick={() => handle_verify_email()}
               >
                 Verify Email
               </div>
-              <div className="dropdown-item" onClick={handleLogout}>
+              <div className="dropdown-item" onClick={() => handleLogout()}>
                 Logout
               </div>
             </div>
